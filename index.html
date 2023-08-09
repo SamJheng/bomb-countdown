@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" class=" h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bomb Timer</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-full bg-zinc-900 text-white">
+  <!-- <audio id="sound" src="explosion.mp3"></audio> -->
+  <div class="space-x-1">
+    <label for="time">Set Time (hh:mm:ss):</label>
+    <input type="text" id="time" class="border border-2 bg-gray-200 text-black" placeholder="00:00:00" value="00:05:00">
+    <button id="start" class="border border-2 bg-green-500 p-1">Start</button>
+    <button id="pause" class="border border-2 bg-yellow-300 p-1">Pause</button>
+    <button id="resume"class="border border-2 bg-emerald-400 p-1">Resume</button>
+    <button id="reset" class="border border-2 bg-red-400 p-1">Reset</button>
+  </div>
+  <div  class="text-9xl text-red-600 flex h-full w-full justify-center items-center">
+    <span id="countdown">00:00:00</span>
+    <span id="bomb">💣</span>
+  </div>
+
+  <script>
+    let timer;
+    let countdownTime = 0;
+    let isPaused = false;
+    const audio = new Audio("explosion.mp3");
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    function startCountdown(targetTime) {
+      countdownTime = targetTime;
+      isPaused = false;
+
+      timer = setInterval(function () {
+        if (!isPaused) {
+          countdownTime--;
+          if (countdownTime <= 0) {
+            clearInterval(timer);
+            document.getElementById("countdown").textContent = "Bang!!!";
+            document.getElementById("bomb").textContent = "💥";
+            
+            audio.play();
+          } else {
+            document.getElementById("countdown").textContent = formatTime(countdownTime);
+          }
+        }
+      }, 1000);
+    }
+
+    document.getElementById("start").addEventListener("click", function () {
+      const inputTime = document.getElementById("time").value;
+      const timeParts = inputTime.split(":");
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1], 10);
+      const seconds = parseInt(timeParts[2], 10);
+
+      const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+      startCountdown(totalSeconds);
+    });
+
+    document.getElementById("pause").addEventListener("click", function () {
+      isPaused = true;
+    });
+
+    document.getElementById("resume").addEventListener("click", function () {
+      isPaused = false;
+    });
+
+    document.getElementById("reset").addEventListener("click", function () {
+      clearInterval(timer);
+      document.getElementById("countdown").textContent = "00:00:00";
+      document.getElementById("time").value = "";
+      countdownTime = 0;
+      isPaused = false;
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "p"|| event.key === "P") {
+        isPaused = true;
+      } else if (event.key === "r" || event.key === "R") {
+        isPaused = false;
+      }
+    });
+  </script>
+</body>
+
+</html>
